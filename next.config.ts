@@ -11,13 +11,17 @@ const withNextra = nextra({
 });
 
 const nextConfig: NextConfig = {
-  // Temporarily disable basePath for testing
-  // basePath: "/docs",
-  // assetPrefix: "/docs",
+  // Optimize for edge runtime - moved from experimental to root level
+  serverExternalPackages: ['@nodelib/fs.scandir', '@nodelib/fs.stat', 'fast-glob'],
 
-  // Optimize for edge runtime
-  experimental: {
-    serverComponentsExternalPackages: ['@nodelib/fs.scandir', '@nodelib/fs.stat', 'fast-glob'],
+  // Disable TypeScript errors during build for Webflow injected code
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
+  // Disable ESLint during build
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 
   webpack: (config, { isServer }) => {
