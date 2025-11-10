@@ -1,0 +1,110 @@
+.button-main {
+  position: static;
+  left: auto;
+  top: auto;
+  right: 0%;
+  bottom: 0%;
+
+  display: flex;
+  width: 180px;
+  height: 40px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0px;
+  justify-content: center;
+  align-items: center;
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+
+  border-radius: 96px;
+
+  background-color: hsla(0, 0.00%, 10.20%, 1.00);
+
+  transition: all 200ms ease;
+
+  text-decoration: none;
+}
+
+.button-main:hover {
+  background-color: hsla(0, 0.00%, 20.00%, 1.00);
+  background-image: none;
+  box-shadow: 0 8px 24px 0 rgba(0,0,0,0.2);
+  transform: translate(0px, -2px);
+}
+
+.button-main:active {
+  background-color: hsla(0, 0.00%, 5.10%, 1.00);
+  transform: scale(0.98) translate(0px, 0px) translate(0px, -2px);
+}
+
+@media screen and (max-width: 479px) {
+  .button-main {
+    width: 120px;
+    height: 30px;
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+}
+
+.button-main.pagination-button {
+  width: 100px;
+}
+
+@media screen and (min-width: 1440px) {
+  .button-main.pagination-button {
+    margin-right: auto;
+  }
+}
+
+.button-main.footerbutton {
+  margin-right: 0px;
+  margin-left: 0px;
+  justify-content: center;
+  align-items: center;
+}
+
+@media screen and (max-width: 479px) {
+  .button-main.footerbutton {
+    height: 40px;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .button-main.viewmore {
+    margin-right: auto;
+  }
+}
+
+.button-main.auto {
+  margin-right: auto;
+}
+
+@media screen and (min-width: 1440px) {
+  .button-main.auto {
+    margin-right: auto;
+  }
+}
+
+.button-main-text {
+  color: hsla(0, 0.00%, 100.00%, 1.00);
+  font-size: 13px;
+  line-height: 16px;
+}
+
+@media screen and (max-width: 479px) {
+  .button-main-text {
+    font-size: 10px;
+    line-height: 13px;
+  }
+}
+
+.button-arrow {
+  display: flex;
+  width: 16px;
+  height: 16px;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+
+  color: hsla(0, 77.51%, 48.82%, 1.00);
+}

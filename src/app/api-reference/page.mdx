@@ -1,0 +1,239 @@
+# API Reference
+
+Complete API documentation for integrating with Webflow Cloud.
+
+## Authentication
+
+### Get Access Token
+
+```http
+POST /api/auth/token
+Content-Type: application/json
+
+{
+  "client_id": "your_client_id",
+  "client_secret": "your_client_secret",
+  "grant_type": "client_credentials"
+}
+```
+
+**Response:**
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+
+## Sites API
+
+### List Sites
+
+Retrieve all sites in your workspace.
+
+```typescript
+GET /api/v1/sites
+```
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+Accept: application/json
+```
+
+**Response:**
+
+```json
+{
+  "sites": [
+    {
+      "id": "site_123",
+      "name": "My Documentation Site",
+      "domain": "docs.example.com",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 20,
+    "total": 45
+  }
+}
+```
+
+### Get Site Details
+
+```typescript
+GET /api/v1/sites/{site_id}
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `site_id` | string | The unique site identifier |
+
+**Example Request:**
+
+```bash
+curl -X GET "https://api.webflow.com/v1/sites/site_123" \
+  -H "Authorization: Bearer {access_token}" \
+  -H "Accept: application/json"
+```
+
+## Collections API
+
+### Create Collection Item
+
+```typescript
+POST /api/v1/collections/{collection_id}/items
+```
+
+**Request Body:**
+
+```typescript
+interface CreateItemRequest {
+  name: string;
+  slug: string;
+  fields: {
+    [key: string]: string | number | boolean;
+  };
+  _draft?: boolean;
+  _archived?: boolean;
+}
+```
+
+**Example:**
+
+```json
+{
+  "name": "Getting Started Guide",
+  "slug": "getting-started-guide",
+  "fields": {
+    "title": "Getting Started",
+    "content": "Welcome to our documentation...",
+    "category": "Tutorials",
+    "featured": true
+  },
+  "_draft": false
+}
+```
+
+## Webhooks
+
+### Webhook Events
+
+Subscribe to events in your Webflow site:
+
+| Event | Description |
+|-------|-------------|
+| `site_published` | Triggered when a site is published |
+| `collection_item_created` | New collection item created |
+| `collection_item_updated` | Collection item updated |
+| `collection_item_deleted` | Collection item deleted |
+
+### Webhook Payload
+
+```typescript
+interface WebhookPayload {
+  event: string;
+  site_id: string;
+  workspace_id: string;
+  triggered_at: string;
+  data: {
+    item_id?: string;
+    collection_id?: string;
+    [key: string]: any;
+  };
+}
+```
+
+## Error Handling
+
+### Error Response Format
+
+```json
+{
+  "error": {
+    "code": "invalid_request",
+    "message": "The request is missing required parameters",
+    "details": [
+      {
+        "field": "name",
+        "message": "Name is required"
+      }
+    ]
+  }
+}
+```
+
+### HTTP Status Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 429 | Too Many Requests |
+| 500 | Internal Server Error |
+
+## Rate Limiting
+
+API requests are limited to:
+
+- **Standard Plan**: 60 requests/minute
+- **Pro Plan**: 120 requests/minute
+- **Enterprise**: Custom limits
+
+**Response Headers:**
+
+```
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 45
+X-RateLimit-Reset: 1609459200
+```
+
+## SDK Examples
+
+### Node.js
+
+```javascript
+import { WebflowClient } from '@webflow/sdk';
+
+const client = new WebflowClient({
+  accessToken: process.env.WEBFLOW_ACCESS_TOKEN
+});
+
+// List sites
+const sites = await client.sites.list();
+
+// Get collection items
+const items = await client.collections.items.list({
+  collectionId: 'collection_123'
+});
+```
+
+### Python
+
+```python
+from webflow import WebflowClient
+
+client = WebflowClient(access_token=os.getenv('WEBFLOW_ACCESS_TOKEN'))
+
+# List sites
+sites = client.sites.list()
+
+# Create collection item
+item = client.collections.items.create(
+    collection_id='collection_123',
+    fields={
+        'name': 'New Item',
+        'slug': 'new-item'
+    }
+)
+```

@@ -1,0 +1,114 @@
+# Welcome to Nextra on Webflow Cloud
+
+Build beautiful documentation with [Nextra 4.0](https://nextra.site/) and deploy to [Webflow Cloud](https://webflow.com/cloud) in minutes.
+
+import { Callout } from 'nextra/components'
+
+<Callout type="info">
+  🎉 **New!** This site is now running on Nextra 4.0 with Next.js 15 App Router and deployed on Webflow Cloud's edge network.
+</Callout>
+
+## Why Nextra + Webflow Cloud?
+
+### 🚀 Blazing Fast
+
+Built with Next.js 15 and deployed on Cloudflare's edge network for sub-50ms response times globally.
+
+### 🎨 Beautiful by Default
+
+Modern, responsive design with dark mode support and smooth animations out of the box.
+
+### 📝 Write in MDX
+
+Combine the simplicity of Markdown with the power of React components for rich, interactive documentation.
+
+### 🔍 Full-Text Search
+
+Built-in search functionality helps users find what they need instantly.
+
+## Quick Start
+
+Get your documentation site running in 3 simple steps:
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Run development server
+npm run dev
+
+# 3. Deploy to Webflow Cloud
+npm run deploy
+```
+
+<Callout type="warning">
+  Make sure you have Node.js 18+ and a Webflow Cloud account before starting.
+</Callout>
+
+## What's Included
+
+This documentation template comes with:
+
+| Feature | Description |
+|---------|-------------|
+| 📄 **Multiple Page Types** | Home, guides, API reference, and more |
+| 💅 **Styled Components** | Callouts, code blocks, tables, and rich formatting |
+| 🌐 **SEO Optimized** | Automatic sitemap, meta tags, and Open Graph |
+| 📱 **Mobile Responsive** | Perfect on all devices |
+| 🎯 **TypeScript** | Full type safety throughout |
+
+## Explore the Demo
+
+Check out these pages to see what's possible:
+
+- **[Components](/components)** - UI components and formatting options
+- **[Guides](/guides)** - Step-by-step tutorials and best practices
+- **[API Reference](/api-reference)** - Complete API documentation example
+- **[About](/about)** - Learn more about this project
+
+## Code Example
+
+Here's a taste of what you can do with MDX:
+
+```typescript showLineNumbers {5-7}
+import { useState } from 'react';
+
+export function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      Clicked {count} times
+    </button>
+  );
+}
+```
+
+## Features Showcase
+
+### Callouts
+
+<Callout type="error">
+  **Important:** Always test your documentation before deploying to production!
+</Callout>
+
+### Lists & Formatting
+
+- **Performance**: Edge-native deployment for speed
+- **Developer Experience**: Hot reload, TypeScript support
+- **SEO**: Automatic optimization for search engines
+- **Customization**: Easy to theme and extend
+
+### Inline Code & Links
+
+Use `npm run dev` to start the development server. Read the [Getting Started](/getting-started) guide for more details.
+
+---
+
+## Ready to Build?
+
+Start exploring the documentation using the navigation sidebar, or jump straight to the [Getting Started](/getting-started) guide.
+
+<Callout>
+  Need help? Check out the [Nextra Documentation](https://nextra.site) or [Webflow Cloud Docs](https://developers.webflow.com/webflow-cloud).
+</Callout>

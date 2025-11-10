@@ -1,0 +1,147 @@
+# Components
+
+This page demonstrates various components and styles available in Nextra.
+
+## Callouts
+
+import { Callout } from 'nextra/components'
+
+<Callout type="info">
+  This is an info callout. Use it to highlight important information.
+</Callout>
+
+<Callout type="warning">
+  This is a warning callout. Use it for warnings and cautions.
+</Callout>
+
+<Callout type="error">
+  This is an error callout. Use it to highlight errors or critical issues.
+</Callout>
+
+## Code Blocks
+
+### TypeScript Example
+
+```typescript showLineNumbers {3-5}
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+}
+
+function createUser(data: Omit<User, 'id'>): User {
+  return {
+    id: crypto.randomUUID(),
+    ...data
+  };
+}
+
+const newUser = createUser({
+  name: "John Doe",
+  email: "john@example.com",
+  role: "user"
+});
+```
+
+### JavaScript with Filename
+
+```javascript filename="config.js" copy
+export default {
+  apiUrl: process.env.API_URL || 'http://localhost:3000',
+  timeout: 5000,
+  retries: 3,
+
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+};
+```
+
+### Bash Commands
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Deploy to Webflow Cloud
+npm run deploy
+```
+
+## Tables
+
+| Feature | Nextra | Standard Docs |
+|---------|--------|---------------|
+| MDX Support | ✅ | ❌ |
+| Code Highlighting | ✅ | ✅ |
+| Search | ✅ | ⚠️ |
+| Dark Mode | ✅ | ⚠️ |
+| Mobile Responsive | ✅ | ✅ |
+| i18n | ✅ | ❌ |
+
+## Lists
+
+### Ordered List
+
+1. First, install all dependencies
+2. Then, configure your environment
+3. Next, run the development server
+4. Finally, deploy to production
+
+### Unordered List
+
+- **Performance**: Built with Next.js 15 for optimal speed
+- **Developer Experience**: Hot reload, TypeScript support
+- **SEO Friendly**: Automatic sitemap and meta tags
+- **Customizable**: Easy to theme and style
+
+### Nested Lists
+
+- Frontend Technologies
+  - React 19
+  - Next.js 15
+  - TypeScript 5
+- Backend Integration
+  - REST APIs
+  - GraphQL
+  - Webhooks
+- Deployment
+  - Webflow Cloud
+  - Cloudflare Workers
+  - Edge Computing
+
+## Links and Navigation
+
+- [Home](/)
+- [Getting Started](/getting-started)
+- [API Reference](/api-reference)
+- [External Link: Nextra Docs](https://nextra.site)
+
+## Inline Code
+
+Use `npm install` to install dependencies. Configure your `next.config.ts` file with the proper `basePath` setting.
+
+## Blockquotes
+
+> "Documentation is a love letter that you write to your future self."
+>
+> — Damian Conway
+
+> **Tip**: Always keep your documentation up to date. It's easier to maintain than to rewrite from scratch.
+
+## Horizontal Rule
+
+---
+
+## Text Formatting
+
+This text demonstrates **bold**, *italic*, ***bold and italic***, ~~strikethrough~~, and `inline code` formatting.
+
+You can also use <u>underline</u> with HTML tags when needed.

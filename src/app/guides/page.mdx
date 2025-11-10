@@ -1,0 +1,245 @@
+# Guides
+
+Step-by-step guides to help you build with Nextra and Webflow Cloud.
+
+## Quick Start Guides
+
+### Deploy Your First Site
+
+Learn how to deploy a Nextra documentation site to Webflow Cloud in under 10 minutes.
+
+**Prerequisites:**
+- Node.js 18+ installed
+- A Webflow Cloud account
+- Basic knowledge of React/Next.js
+
+**Steps:**
+
+1. **Initialize your project**
+   ```bash
+   npx create-next-app@latest my-docs --typescript --tailwind --app
+   cd my-docs
+   ```
+
+2. **Install Nextra**
+   ```bash
+   npm install nextra nextra-theme-docs
+   ```
+
+3. **Configure Next.js**
+
+   Update `next.config.ts`:
+   ```typescript
+   import nextra from 'nextra'
+
+   const withNextra = nextra({
+     theme: 'nextra-theme-docs',
+     themeConfig: './theme.config.tsx'
+   })
+
+   export default withNextra({
+     basePath: '/docs',
+     assetPrefix: '/docs'
+   })
+   ```
+
+4. **Initialize Webflow Cloud**
+   ```bash
+   npm install -g @webflow/cli
+   webflow cloud init
+   ```
+
+5. **Deploy**
+   ```bash
+   npm run build
+   webflow cloud deploy
+   ```
+
+### Customizing Your Theme
+
+Learn how to customize colors, fonts, and layouts.
+
+**Theme Configuration:**
+
+```tsx filename="theme.config.tsx"
+import { DocsThemeConfig } from 'nextra-theme-docs'
+
+const config: DocsThemeConfig = {
+  logo: <strong>My Documentation</strong>,
+  project: {
+    link: 'https://github.com/yourusername/your-repo'
+  },
+  docsRepositoryBase: 'https://github.com/yourusername/your-repo/tree/main',
+  useNextSeoProps() {
+    return {
+      titleTemplate: '%s – My Docs'
+    }
+  },
+  head: (
+    <>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta property="og:title" content="My Documentation" />
+      <meta property="og:description" content="The best docs ever" />
+    </>
+  ),
+  footer: {
+    text: (
+      <span>
+        MIT {new Date().getFullYear()} © My Project
+      </span>
+    )
+  }
+}
+
+export default config
+```
+
+## Advanced Guides
+
+### Custom Components
+
+Create reusable MDX components for your documentation.
+
+**Example: Feature Card Component**
+
+```tsx filename="components/FeatureCard.tsx"
+interface FeatureCardProps {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+export function FeatureCard({ title, description, icon }: FeatureCardProps) {
+  return (
+    <div className="border rounded-lg p-6 hover:shadow-lg transition">
+      <div className="text-4xl mb-4">{icon}</div>
+      <h3 className="text-xl font-bold mb-2">{title}</h3>
+      <p className="text-gray-600">{description}</p>
+    </div>
+  );
+}
+```
+
+**Usage in MDX:**
+
+```mdx
+import { FeatureCard } from '@/components/FeatureCard'
+
+<div className="grid grid-cols-3 gap-4 my-8">
+  <FeatureCard
+    icon="⚡"
+    title="Fast"
+    description="Optimized for performance"
+  />
+  <FeatureCard
+    icon="🎨"
+    title="Beautiful"
+    description="Modern design out of the box"
+  />
+  <FeatureCard
+    icon="🔧"
+    title="Flexible"
+    description="Highly customizable"
+  />
+</div>
+```
+
+### Search Integration
+
+Add full-text search to your documentation.
+
+```bash
+npm install flexsearch
+```
+
+Configure in `next.config.ts`:
+
+```typescript
+const withNextra = nextra({
+  theme: 'nextra-theme-docs',
+  themeConfig: './theme.config.tsx',
+  defaultShowCopyCode: true,
+  flexsearch: {
+    codeblocks: true
+  }
+})
+```
+
+### Internationalization (i18n)
+
+Support multiple languages in your documentation.
+
+**Directory Structure:**
+
+```
+src/
+├── app/
+│   ├── [lang]/
+│   │   ├── en/
+│   │   │   └── page.mdx
+│   │   ├── zh/
+│   │   │   └── page.mdx
+│   │   └── ja/
+│   │       └── page.mdx
+```
+
+**Language Selector:**
+
+```tsx filename="components/LanguageSelector.tsx"
+export function LanguageSelector() {
+  const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'zh', name: '中文' },
+    { code: 'ja', name: '日本語' }
+  ]
+
+  return (
+    <select onChange={(e) => {
+      window.location.href = `/${e.target.value}`
+    }}>
+      {languages.map(lang => (
+        <option key={lang.code} value={lang.code}>
+          {lang.name}
+        </option>
+      ))}
+    </select>
+  )
+}
+```
+
+## Best Practices
+
+### Documentation Structure
+
+Organize your docs for easy navigation:
+
+```
+docs/
+├── introduction/
+│   ├── index.mdx
+│   └── quick-start.mdx
+├── guides/
+│   ├── basic/
+│   └── advanced/
+├── api-reference/
+│   ├── authentication.mdx
+│   └── endpoints.mdx
+└── examples/
+    ├── use-cases.mdx
+    └── tutorials.mdx
+```
+
+### Writing Tips
+
+1. **Start with the "Why"**: Explain why something matters before how to do it
+2. **Use Examples**: Show, don't just tell
+3. **Keep it Simple**: Use clear, concise language
+4. **Update Regularly**: Documentation should evolve with your product
+
+### Performance Optimization
+
+- Use static generation when possible
+- Optimize images with Next.js Image component
+- Enable code splitting
+- Implement caching strategies
+- Monitor Core Web Vitals
