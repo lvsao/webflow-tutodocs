@@ -51,6 +51,37 @@ Visit http://localhost:3002
 
 ### Deploy to Webflow Cloud
 
+#### Method 1: UI Deployment (Recommended) ⭐
+
+This method is **recommended** for its simplicity and automatic updates:
+
+1. **Upload to GitHub**
+   - Push your project to a GitHub repository (public or private)
+   - Example: `https://github.com/yourusername/your-nextra-docs`
+
+2. **Connect to Webflow Cloud**
+   - Go to [Webflow Dashboard](https://webflow.com/dashboard) → **Webflow Cloud**
+   - Click **Sign in with GitHub** to authorize Webflow to access your repositories
+
+3. **Create New Project**
+   - Click **Create a new project**
+   - Select the GitHub repository you just uploaded
+   - Choose the branch you want to deploy (e.g., `main` or `master`)
+
+4. **Configure and Deploy**
+   - Set your custom domain path (e.g., `/docs`)
+   - Click **Deploy**
+
+**Benefits:**
+- ✅ Simple visual interface - no CLI required
+- ✅ Automatic deployments - GitHub updates trigger automatic redeployments
+- ✅ Easy to maintain and update
+- ✅ Built-in CI/CD pipeline
+
+#### Method 2: CLI Deployment
+
+For developers who prefer command-line interface:
+
 ```bash
 # Initialize Webflow Cloud (if not already done)
 webflow cloud init
@@ -176,6 +207,63 @@ By marking file system libraries as external and adding webpack fallbacks, we:
 │ Workers         │
 └─────────────────┘
 ```
+
+## Search Functionality
+
+### ⚠️ Search is Disabled
+
+This example has **search functionality disabled** (`search: false` in `theme.config.tsx`). Here's why:
+
+**Problem**: Nextra 4 uses Pagefind for search, which relies on:
+- Dynamic ES module imports
+- WebAssembly (WASM) modules
+- Client-side module resolution
+
+**Why it fails on Webflow Cloud**:
+
+1. **Edge Runtime Limitation**: Webflow Cloud runs on Cloudflare Workers (edge runtime)
+2. **CORS Issue**: Dynamic imports trigger CORS restrictions in the edge environment
+3. **Module Resolution**: Pagefind fails to resolve `_pagefind/pagefind.js` with error:
+   ```
+   Failed to resolve module specifier "/docs/pagefind/pagefind.js"
+   The base URL is about:blank because import0 is called from a CORS-cross-origin script
+   ```
+
+**Why we can't work around it**:
+
+- ❌ Webflow Cloud doesn't support `child_process` (no post-build scripts)
+- ❌ Nextra 4 only officially supports Pagefind (no alternative search engines)
+- ❌ Pre-generating and committing the index doesn't help (CORS still occurs at runtime)
+- ❌ Custom search components face the same edge runtime constraints
+
+**Current Solutions**:
+
+1. **Use without search** (current approach) - Your site works perfectly, just without full-text search
+2. **Implement external search** - Add Algolia or another external search service (requires custom implementation)
+3. **Wait for fixes** - Monitor Pagefind and Webflow Cloud updates for edge runtime compatibility improvements
+
+**For Local Development**:
+
+If you want search functionality locally:
+
+```bash
+# Install Pagefind (already in devDependencies)
+npm install -D pagefind
+
+# Build and index
+npm run build
+npm run index  # Runs: node scripts/run-pagefind.mjs
+
+# Re-enable search in theme.config.tsx: search: true (or remove search: false)
+```
+
+Local development will have search, but Webflow Cloud deployment won't.
+
+### Related Issues
+
+- [Nextra Issue #4460](https://github.com/shuding/nextra/issues/4460) - Failed to load search index
+- [Nextra Issue #4807](https://github.com/shuding/nextra/issues/4807) - Pagefind search issues
+- [Webflow Cloud Node.js Compatibility](https://developers.webflow.com/webflow-cloud/environment/nodejs-compatibility) - No child_process support
 
 ## Common Issues & Solutions
 
