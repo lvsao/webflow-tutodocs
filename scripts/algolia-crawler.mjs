@@ -24,7 +24,7 @@
  * - npm run index
  */
 
-import algoliasearch from 'algoliasearch';
+import algoliasearch from 'algoliasearch/dist/algoliasearch.umd.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
