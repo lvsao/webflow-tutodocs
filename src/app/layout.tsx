@@ -1,6 +1,6 @@
 import { Footer, Layout, Navbar } from 'nextra-theme-docs'
-import { Banner } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
+import { DocSearchComponent } from '@/components/DocSearchComponent'
 import 'nextra-theme-docs/style.css'
 
 export const metadata = {
@@ -11,11 +11,6 @@ export const metadata = {
   },
 }
 
-const banner = (
-  <Banner storageKey="nextra-banner">
-    🚀 Nextra 4.0 on Webflow Cloud
-  </Banner>
-)
 
 const navbar = (
   <Navbar
@@ -35,9 +30,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
+      <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
+        {/* Hide any Nextra native search elements and Algolia search CSS conflicts */}
+        <style dangerouslySetInnerHTML={{__html: `
+          .nextra-search,
+          .nextra-search-bar,
+          .nextra-nav-container [role="search"],
+          nav [role="combobox"],
+          nav input[type="search"] {
+            display: none !important;
+          }
+        `}} />
+      </head>
       <body>
         <Layout
-          banner={banner}
+          banner={null}
           navbar={navbar}
           footer={footer}
           pageMap={pageMap}
@@ -46,6 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         >
           {children}
         </Layout>
+        <DocSearchComponent />
       </body>
     </html>
   )

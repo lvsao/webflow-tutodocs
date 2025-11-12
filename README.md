@@ -208,62 +208,194 @@ By marking file system libraries as external and adding webpack fallbacks, we:
 └─────────────────┘
 ```
 
-## Search Functionality
+## 🔍 Search Functionality (Advanced - Optional)
 
-### ⚠️ Search is Disabled
+> **Note for Advanced Users**: This feature is optional and OFF by default. Follow the setup steps below to enable it.
 
-This example has **search functionality disabled** (`search: false` in `theme.config.tsx`). Here's why:
+### Why Algolia Instead of Built-in Search?
 
-**Problem**: Nextra 4 uses Pagefind for search, which relies on:
-- Dynamic ES module imports
-- WebAssembly (WASM) modules
-- Client-side module resolution
+Nextra's default search (Pagefind) is **incompatible with Webflow Cloud's edge runtime** due to:
+- CORS restrictions on dynamic WASM imports
+- Cloudflare Workers edge runtime limitations
+- Module resolution failures in edge environment
 
-**Why it fails on Webflow Cloud**:
+**Solution**: We've implemented **Algolia-powered search** as an optional feature that works seamlessly on Webflow Cloud.
 
-1. **Edge Runtime Limitation**: Webflow Cloud runs on Cloudflare Workers (edge runtime)
-2. **CORS Issue**: Dynamic imports trigger CORS restrictions in the edge environment
-3. **Module Resolution**: Pagefind fails to resolve `_pagefind/pagefind.js` with error:
+### ✨ Search Features (When Configured)
+
+Once you set up Algolia, users get:
+- ⌨️ **Keyboard Shortcuts**: `Cmd+K` / `Ctrl+K` to open search
+- 🎯 **Real-time Search**: Instant results as you type
+- 🗂️ **Hierarchical Results**: Shows page title and section hierarchy
+- ↕️ **Keyboard Navigation**: Arrow keys + Enter to navigate
+- 🔄 **Auto-Updates**: GitHub Actions keeps index fresh on every push
+
+### 📖 Setup Instructions (Step-by-Step)
+
+#### Step 1: Create Algolia Account
+
+1. Go to [algolia.com](https://www.algolia.com/) and sign up (free tier available)
+2. Create a new application
+3. Create a new index named `documentation`
+
+#### Step 2: Get API Credentials
+
+1. Go to **API Keys** in your Algolia dashboard
+2. Copy and save:
+   - **Application ID** (public)
+   - **Search-Only API Key** (public, safe for frontend)
+   - **Admin API Key** (secret, store securely)
+
+#### Step 3: Configure Environment Variables
+
+**For Local Development:**
+
+1. Copy `.env.example` to `.env.local`:
+   ```bash
+   cp .env.example .env.local
    ```
-   Failed to resolve module specifier "/docs/pagefind/pagefind.js"
-   The base URL is about:blank because import0 is called from a CORS-cross-origin script
+
+2. Fill in your credentials:
+   ```env
+   NEXT_PUBLIC_ALGOLIA_APP_ID=your_app_id_here
+   NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=your_search_key_here
+   ALGOLIA_WRITE_API_KEY=your_admin_key_here
    ```
 
-**Why we can't work around it**:
+3. (Optional) If your site uses a base path, set it:
+   ```env
+   BASE_PATH=/docs
+   ```
 
-- ❌ Webflow Cloud doesn't support `child_process` (no post-build scripts)
-- ❌ Nextra 4 only officially supports Pagefind (no alternative search engines)
-- ❌ Pre-generating and committing the index doesn't help (CORS still occurs at runtime)
-- ❌ Custom search components face the same edge runtime constraints
+**For Webflow Cloud:**
 
-**Current Solutions**:
+1. Go to your Webflow Dashboard → **Project Settings** → **Environment Variables**
+2. Add **public environment variables** (only these are available at runtime):
+   ```
+   NEXT_PUBLIC_ALGOLIA_APP_ID = your_app_id
+   NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY = your_search_key
+   ```
+   - Do NOT add `ALGOLIA_WRITE_API_KEY` to Webflow (not needed for frontend)
 
-1. **Use without search** (current approach) - Your site works perfectly, just without full-text search
-2. **Implement external search** - Add Algolia or another external search service (requires custom implementation)
-3. **Wait for fixes** - Monitor Pagefind and Webflow Cloud updates for edge runtime compatibility improvements
+**For GitHub Actions (Auto-Indexing):**
 
-**For Local Development**:
+1. Go to your GitHub repository → **Settings** → **Secrets and Variables** → **Actions**
+2. Add repository secrets:
+   ```
+   ALGOLIA_APP_ID = your_app_id
+   ALGOLIA_WRITE_API_KEY = your_admin_key
+   ```
 
-If you want search functionality locally:
+#### Step 4: Initial Index
+
+Index your documentation for the first time:
 
 ```bash
-# Install Pagefind (already in devDependencies)
-npm install -D pagefind
-
-# Build and index
-npm run build
-npm run index  # Runs: node scripts/run-pagefind.mjs
-
-# Re-enable search in theme.config.tsx: search: true (or remove search: false)
+npm run index
 ```
 
-Local development will have search, but Webflow Cloud deployment won't.
+You should see output like:
+```
+✅ Indexed: Getting Started (5 records)
+✅ Indexed: API Reference (8 records)
+...
+✅ Successfully indexed 45 records
+📊 Total records: 45
+🚀 Your search is now ready to use!
+```
 
-### Related Issues
+#### Step 5: Verify Search is Working
 
-- [Nextra Issue #4460](https://github.com/shuding/nextra/issues/4460) - Failed to load search index
-- [Nextra Issue #4807](https://github.com/shuding/nextra/issues/4807) - Pagefind search issues
-- [Webflow Cloud Node.js Compatibility](https://developers.webflow.com/webflow-cloud/environment/nodejs-compatibility) - No child_process support
+1. Start development server: `npm run dev`
+2. Visit http://localhost:3002
+3. Press `Cmd+K` (or `Ctrl+K` on Windows/Linux)
+4. Search for a term from your documentation
+
+If the search modal opens and you can type, it's working!
+
+#### Step 6: Deploy and Auto-Indexing
+
+Once you push to GitHub, the GitHub Actions workflow automatically:
+1. Detects documentation changes
+2. Runs the indexer
+3. Uploads new records to Algolia
+4. Deploys to Webflow Cloud
+
+No manual intervention needed!
+
+### ⚙️ Configuration Details
+
+#### Base Path Auto-Detection
+
+The crawler intelligently detects your site's base path:
+
+1. **First check**: `BASE_PATH` environment variable
+2. **Second check**: `NEXT_PUBLIC_BASE_PATH` environment variable
+3. **Third check**: `basePath` in `next.config.ts`
+4. **Default**: Root path (empty string)
+
+This prevents 404 errors when clicking search results on sites deployed under a subdirectory.
+
+#### Customizing Crawler Behavior
+
+Edit `scripts/algolia-crawler.mjs` to:
+- Change the index name (line 48): `const indexName = 'documentation'`
+- Adjust content truncation limits (lines 68, 84, 104)
+- Add custom record fields or metadata
+
+### 🔧 Troubleshooting
+
+#### Search box doesn't appear
+
+**Cause**: Missing or incorrect environment variables
+
+**Solution**:
+1. Verify `NEXT_PUBLIC_ALGOLIA_APP_ID` and `NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY` are set
+2. Restart development server after setting variables
+3. Check browser console for errors (F12 → Console tab)
+
+#### Search returns no results
+
+**Cause**: Index is empty or hasn't been populated
+
+**Solution**:
+1. Run `npm run index` to populate the index
+2. Check Algolia dashboard to verify records exist
+3. Wait for GitHub Actions workflow to complete if auto-indexing
+
+#### 404 errors when clicking search results
+
+**Cause**: BASE_PATH mismatch
+
+**Solution**:
+1. Set `BASE_PATH` to match your deployment path (e.g., `/docs`)
+2. Re-run `npm run index` to re-index with correct paths
+3. Verify URLs in Algolia dashboard under **Indices** → **documentation** → **Browser**
+
+#### GitHub Actions workflow not triggering
+
+**Cause**: Secrets not configured
+
+**Solution**:
+1. Verify secrets exist: Go to **Settings** → **Secrets and variables** → **Actions**
+2. Check both `ALGOLIA_APP_ID` and `ALGOLIA_WRITE_API_KEY` are set
+3. Trigger manually: Go to **Actions** → **Index Documentation to Algolia** → **Run workflow**
+
+### 🚫 Disabling Search
+
+To disable search:
+1. Remove Algolia environment variables
+2. The search UI automatically disappears
+3. Your site continues to work normally
+
+No code changes needed!
+
+### 📚 Related Documentation
+
+- [Algolia Documentation](https://www.algolia.com/doc/)
+- [Algolia API Keys Guide](https://www.algolia.com/doc/guides/security/api-keys/)
+- [GitHub Actions Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+- [Webflow Cloud Environment Variables](https://developers.webflow.com/webflow-cloud/environment/env-variables)
 
 ## Common Issues & Solutions
 
