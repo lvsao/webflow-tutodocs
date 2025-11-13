@@ -1,5 +1,11 @@
 # Nextra on Webflow Cloud
 
+[![Live Demo](https://img.shields.io/badge/Demo-Live-success?style=for-the-badge&logo=vercel)](https://selofy.com/nextrademo)
+[![Webflow Cloud](https://img.shields.io/badge/Webflow-Cloud-4353FF?style=for-the-badge&logo=webflow&logoColor=white)](https://webflow.com/cloud)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Nextra](https://img.shields.io/badge/Nextra-4.0-blue?style=for-the-badge)](https://nextra.site/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](./LICENSE)
+
 A production-ready example of deploying [Nextra 4.0](https://nextra.site/) documentation site to [Webflow Cloud](https://developers.webflow.com/webflow-cloud), running on Cloudflare Workers edge runtime.
 
 **Live Demo**: https://selofy.com/nextrademo
@@ -282,6 +288,12 @@ You can still type-check locally before pushing.
 
 ## Tech Stack
 
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=flat-square&logo=Cloudflare&logoColor=white)
+![MDX](https://img.shields.io/badge/MDX-1B1F24?style=flat-square&logo=mdx&logoColor=white)
+
 - **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
 - **Documentation**: [Nextra 4.0](https://nextra.site/)
 - **Hosting**: [Webflow Cloud](https://developers.webflow.com/webflow-cloud)
@@ -315,4 +327,16 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ---
 
+<div align="center">
+
 **Questions?** Visit [Webflow's Developer Forum](https://discourse.webflow.com/c/app-developers/90) or check the [official documentation](#official-documentation).
+
+### Star this project ⭐ if you find it helpful!
+
+[![GitHub stars](https://img.shields.io/github/stars/lvsao/webflow-nextra?style=social)](https://github.com/lvsao/webflow-nextra)
+[![GitHub forks](https://img.shields.io/github/forks/lvsao/webflow-nextra?style=social)](https://github.com/lvsao/webflow-nextra/fork)
+[![GitHub watchers](https://img.shields.io/github/watchers/lvsao/webflow-nextra?style=social)](https://github.com/lvsao/webflow-nextra)
+
+Made with ❤️ for the Webflow developer community
+
+</div>
