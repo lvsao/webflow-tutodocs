@@ -8,6 +8,8 @@ initOpenNextCloudflareForDev();
 // Configure Nextra
 const withNextra = nextra({
   defaultShowCopyCode: true,
+  // Disable git timestamp features for Webflow Cloud deployment
+  readingTime: false,
 });
 
 const nextConfig: NextConfig = {

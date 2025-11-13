@@ -31,6 +31,14 @@ const config: DocsThemeConfig = {
   // Disable search due to Pagefind incompatibility with Webflow Cloud edge runtime
   // See README.md for more details
   search: false,
+  // Disable git-related features for Webflow Cloud deployment
+  editLink: {
+    component: null,
+  },
+  feedback: {
+    content: null,
+  },
+  gitTimestamp: null,
   primaryHue: 200,
   primarySaturation: 100,
 };
