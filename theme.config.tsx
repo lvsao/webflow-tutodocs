@@ -1,11 +1,11 @@
 import type { DocsThemeConfig } from "nextra-theme-docs";
 
 const config: DocsThemeConfig = {
-  logo: <span style={{ fontWeight: "bold" }}>📚 My Documentation</span>,
+  logo: <span style={{ fontWeight: "bold" }}>📚 Nextra on Webflow Cloud</span>,
   project: {
-    link: "https://github.com/yourusername/your-repo",
+    link: "https://github.com/lvsao/webflow-nextra",
   },
-  docsRepositoryBase: "https://github.com/yourusername/your-repo/tree/main",
+  docsRepositoryBase: "https://github.com/lvsao/webflow-nextra/tree/master",
   footer: {
     content: (
       <span>
@@ -13,19 +13,17 @@ const config: DocsThemeConfig = {
         <a href="https://nextra.site" target="_blank" rel="noopener">
           Powered by Nextra
         </a>
+        {" | "}
+        <a href="https://webflow.com/cloud" target="_blank" rel="noopener">
+          Deployed on Webflow Cloud
+        </a>
       </span>
     ),
   },
-  useNextSeoProps() {
-    return {
-      titleTemplate: "%s – My Documentation",
-    };
-  },
-  head: () => (
+  head: (
     <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta property="og:title" content="Documentation" />
-      <meta property="og:description" content="Documentation powered by Nextra and Webflow Cloud" />
+      <link rel="icon" href="/favicon.ico" />
     </>
   ),
   // Disable search due to Pagefind incompatibility with Webflow Cloud edge runtime
