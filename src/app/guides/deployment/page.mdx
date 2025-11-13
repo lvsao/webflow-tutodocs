@@ -1,0 +1,325 @@
+# Deploying Nextra to Webflow Cloud
+
+This guide will walk you through deploying a Nextra 4.0 documentation site to Webflow Cloud, running on Cloudflare Workers edge runtime.
+
+## What You'll Learn
+
+- How to set up a Nextra project for Webflow Cloud
+- Understanding edge runtime compatibility
+- Configuring critical files for deployment
+- Deploying via GitHub or CLI
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- **Node.js 20.0.0 or higher** installed
+- **npm package manager**
+- A **Webflow account** ([Sign up](https://webflow.com/))
+- **Webflow CLI**: Install with `npm install -g @webflow/cli`
+- **Git** for version control
+- Basic knowledge of React/Next.js
+
+## Quick Start
+
+### 1. Clone the Repository
+
+```bash
+# Clone this template
+git clone <your-repository-url>
+cd <your-repository-name>
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+Visit http://localhost:3000 to see your documentation site.
+
+### 2. Project Structure
+
+Understanding the key files:
+
+```
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx           # Root layout with Nextra components
+│   │   ├── _meta.tsx            # Sidebar navigation structure
+│   │   ├── page.mdx             # Home page
+│   │   └── [your-docs]/         # Your documentation pages
+│   ├── components/              # React components
+│   └── devlink/                 # Webflow Devlink components
+├── mdx-components.tsx           # Theme component imports (CRITICAL)
+├── next.config.ts               # Next.js + Nextra + Edge runtime config
+├── theme.config.tsx             # Nextra theme settings
+├── wrangler.json                # Cloudflare Workers config
+├── webflow.json                 # Webflow Cloud config
+└── open-next.config.ts          # OpenNext adapter config
+```
+
+## Critical Configuration Files
+
+### mdx-components.tsx
+
+**Most Important File** - Without this, your sidebar won't render:
+
+```typescript
+import type { MDXComponents } from "mdx/types";
+import { useMDXComponents as getThemeComponents } from 'nextra-theme-docs';
+
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  const themeComponents = getThemeComponents();
+
+  return {
+    ...themeComponents,
+    ...components,
+  };
+}
+```
+
+### next.config.ts
+
+Handles edge runtime compatibility:
+
+```typescript
+const nextConfig: NextConfig = {
+  // Mark file system libraries as external
+  serverExternalPackages: ['@nodelib/fs.scandir', '@nodelib/fs.stat', 'fast-glob'],
+
+  // Webflow injects code that causes TS errors
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
+  // Prevent fs module from bundling on client
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        fs: false,
+        module: false,
+        path: false,
+        os: false,
+      };
+    }
+    return config;
+  },
+};
+```
+
+### wrangler.json
+
+Enables Node.js compatibility in Cloudflare Workers:
+
+```json
+{
+  "compatibility_flags": ["nodejs_compat"]
+}
+```
+
+This flag is **critical** - it enables partial Node.js API support at runtime.
+
+## Deployment Methods
+
+### Method 1: GitHub Integration (Recommended) ⭐
+
+This method provides automatic deployments whenever you push to GitHub.
+
+#### Steps:
+
+1. **Push to GitHub**
+
+   Push your project to a GitHub repository (public or private).
+
+2. **Connect to Webflow Cloud**
+
+   - Go to [Webflow Dashboard](https://webflow.com/dashboard) → **Webflow Cloud**
+   - Click **Sign in with GitHub** to authorize
+
+3. **Create New Project**
+
+   - Click **Create a new project**
+   - Select your GitHub repository
+   - Choose the branch to deploy (e.g., `main` or `master`)
+
+4. **Configure and Deploy**
+
+   - Set your custom domain path (e.g., `/docs`)
+   - Click **Deploy**
+
+**Benefits:**
+- ✅ Simple visual interface
+- ✅ Automatic deployments on git push
+- ✅ Easy to maintain
+- ✅ Built-in CI/CD
+
+### Method 2: CLI Deployment
+
+For developers who prefer command-line:
+
+```bash
+# Initialize Webflow Cloud (first time only)
+webflow cloud init
+
+# Deploy
+webflow cloud deploy
+```
+
+## How It Works
+
+### Build Time vs Runtime
+
+The key to making Nextra work on Webflow Cloud:
+
+**Build Time (✅ Allowed)**
+- Nextra scans MDX files using fast-glob
+- Generates a page map for navigation
+
+**Runtime (✅ No File System Needed)**
+- Only the generated page map is used
+- No `fs` module access required
+
+### Architecture
+
+```
+┌─────────────┐
+│  MDX Files  │
+└──────┬──────┘
+       │ Build Time
+       ↓
+┌─────────────────┐
+│  Nextra Scan    │ ← Uses fs, fast-glob
+│  (Build Only)   │
+└──────┬──────────┘
+       │
+       ↓
+┌─────────────────┐
+│   Page Map      │ ← Generated artifact
+└──────┬──────────┘
+       │ Runtime
+       ↓
+┌─────────────────┐
+│ Cloudflare      │ ← No fs module needed
+│ Workers         │
+└─────────────────┘
+```
+
+## Common Issues & Solutions
+
+### Issue: Sidebar Not Showing
+
+**Cause**: Missing theme component imports
+
+**Solution**: Ensure `mdx-components.tsx` imports theme components:
+
+```typescript
+import { useMDXComponents as getThemeComponents } from 'nextra-theme-docs';
+```
+
+### Issue: "Module not found: fs"
+
+**Cause**: File system libraries bundled for client/edge
+
+**Solution**: Add to `next.config.ts`:
+
+```typescript
+serverExternalPackages: ['@nodelib/fs.scandir', '@nodelib/fs.stat', 'fast-glob']
+
+webpack: (config, { isServer }) => {
+  if (!isServer) {
+    config.resolve.fallback = { fs: false, module: false, path: false, os: false };
+  }
+  return config;
+}
+```
+
+### Issue: TypeScript Build Errors
+
+**Cause**: Webflow injects code that triggers type errors
+
+**Solution**: Disable TypeScript checks during build:
+
+```typescript
+typescript: {
+  ignoreBuildErrors: true,
+}
+```
+
+## Customizing Your Site
+
+### Update Theme Configuration
+
+Edit `theme.config.tsx`:
+
+```tsx
+const config: DocsThemeConfig = {
+  logo: <span style={{ fontWeight: "bold" }}>📚 Your Docs</span>,
+  project: {
+    link: "https://github.com/yourusername/your-repo",
+  },
+  docsRepositoryBase: "https://github.com/yourusername/your-repo/tree/main",
+  footer: {
+    content: (
+      <span>
+        {new Date().getFullYear()} © Your Company
+      </span>
+    ),
+  },
+};
+```
+
+### Add Documentation Pages
+
+Create MDX files in `src/app/`:
+
+```bash
+src/app/
+├── getting-started/
+│   └── page.mdx
+├── guides/
+│   └── page.mdx
+└── api-reference/
+    └── page.mdx
+```
+
+Update `src/app/_meta.tsx` for navigation:
+
+```tsx
+export default {
+  index: "Home",
+  "getting-started": "Getting Started",
+  guides: "Guides",
+  "api-reference": "API Reference",
+};
+```
+
+## Search Functionality
+
+⚠️ **Search is not supported** in this version.
+
+Nextra's default search (Pagefind) is incompatible with Webflow Cloud's edge runtime due to CORS restrictions and Cloudflare Workers limitations.
+
+While third-party solutions like Algolia could be integrated, this template focuses on providing a minimal, working deployment.
+
+## Next Steps
+
+- ✅ Customize your theme colors and branding
+- ✅ Add your documentation content
+- ✅ Set up custom domain (optional)
+- ✅ Configure environment variables if needed
+- ✅ Monitor deployment status in Webflow Dashboard
+
+## Resources
+
+- [Nextra Documentation](https://nextra.site/docs)
+- [Webflow Cloud Documentation](https://developers.webflow.com/webflow-cloud)
+- [Node.js Compatibility on Webflow Cloud](https://developers.webflow.com/webflow-cloud/environment/nodejs-compatibility)
+- [OpenNext Cloudflare Adapter](https://opennext.js.org/cloudflare)
+- [GitHub Repository](https://github.com/lvsao/webflow-nextra)
+
+## Need Help?
+
+- Visit [Webflow's Developer Forum](https://discourse.webflow.com/c/app-developers/90)
+- Check the [GitHub Issues](https://github.com/lvsao/webflow-nextra/issues)
+- Review the official documentation linked above

@@ -2,7 +2,7 @@
 
 A production-ready example of deploying [Nextra 4.0](https://nextra.site/) documentation site to [Webflow Cloud](https://developers.webflow.com/webflow-cloud), running on Cloudflare Workers edge runtime.
 
-**Live Demo**: https://xiaos-marvelous-site-960b4b.webflow.io/docs
+**Live Demo**: https://selofy.com/nextrademo
 
 ## What This Example Demonstrates
 
