@@ -37,8 +37,8 @@ This example shows how to solve all these issues.
 
 ```bash
 # Clone the repository
-git clone https://github.com/lvsao/webflow-tutodocs.git
-cd webflow-tutodocs
+git clone <your-repository-url>
+cd <your-repository-name>
 
 # Install dependencies
 npm install
@@ -47,7 +47,7 @@ npm install
 npm run dev
 ```
 
-Visit http://localhost:3002
+Visit http://localhost:3000
 
 ### Deploy to Webflow Cloud
 
@@ -94,12 +94,18 @@ webflow cloud deploy
 
 ```
 ├── src/
-│   └── app/
-│       ├── layout.tsx          # Root layout with Nextra components
-│       ├── _meta.tsx            # Sidebar navigation structure
-│       └── page.mdx             # Home page
-├── lessons/                     # Tutorial content
-│   └── deploy-nextra-to-webflow-cloud.md
+│   ├── app/
+│   │   ├── layout.tsx           # Root layout with Nextra components
+│   │   ├── _meta.tsx            # Sidebar navigation structure
+│   │   ├── page.mdx             # Home page
+│   │   ├── getting-started/     # Getting started documentation
+│   │   ├── guides/              # Guides and tutorials
+│   │   ├── api-reference/       # API documentation
+│   │   ├── components/          # Components documentation
+│   │   └── about/               # About page
+│   ├── components/              # React components
+│   └── devlink/                 # Webflow Devlink components
+├── public/                      # Static assets
 ├── mdx-components.tsx           # Critical: Theme component imports
 ├── next.config.ts               # Next.js + Nextra + Edge runtime config
 ├── theme.config.tsx             # Nextra theme settings
@@ -208,194 +214,16 @@ By marking file system libraries as external and adding webpack fallbacks, we:
 └─────────────────┘
 ```
 
-## 🔍 Search Functionality (Advanced - Optional)
+## ⚠️ Search Functionality Not Supported
 
-> **Note for Advanced Users**: This feature is optional and OFF by default. Follow the setup steps below to enable it.
+**This version does not include search functionality.**
 
-### Why Algolia Instead of Built-in Search?
-
-Nextra's default search (Pagefind) is **incompatible with Webflow Cloud's edge runtime** due to:
+Nextra's default search (Pagefind) is incompatible with Webflow Cloud's edge runtime due to:
 - CORS restrictions on dynamic WASM imports
 - Cloudflare Workers edge runtime limitations
 - Module resolution failures in edge environment
 
-**Solution**: We've implemented **Algolia-powered search** as an optional feature that works seamlessly on Webflow Cloud.
-
-### ✨ Search Features (When Configured)
-
-Once you set up Algolia, users get:
-- ⌨️ **Keyboard Shortcuts**: `Cmd+K` / `Ctrl+K` to open search
-- 🎯 **Real-time Search**: Instant results as you type
-- 🗂️ **Hierarchical Results**: Shows page title and section hierarchy
-- ↕️ **Keyboard Navigation**: Arrow keys + Enter to navigate
-- 🔄 **Auto-Updates**: GitHub Actions keeps index fresh on every push
-
-### 📖 Setup Instructions (Step-by-Step)
-
-#### Step 1: Create Algolia Account
-
-1. Go to [algolia.com](https://www.algolia.com/) and sign up (free tier available)
-2. Create a new application
-3. Create a new index named `documentation`
-
-#### Step 2: Get API Credentials
-
-1. Go to **API Keys** in your Algolia dashboard
-2. Copy and save:
-   - **Application ID** (public)
-   - **Search-Only API Key** (public, safe for frontend)
-   - **Admin API Key** (secret, store securely)
-
-#### Step 3: Configure Environment Variables
-
-**For Local Development:**
-
-1. Copy `.env.example` to `.env.local`:
-   ```bash
-   cp .env.example .env.local
-   ```
-
-2. Fill in your credentials:
-   ```env
-   NEXT_PUBLIC_ALGOLIA_APP_ID=your_app_id_here
-   NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=your_search_key_here
-   ALGOLIA_WRITE_API_KEY=your_admin_key_here
-   ```
-
-3. (Optional) If your site uses a base path, set it:
-   ```env
-   BASE_PATH=/docs
-   ```
-
-**For Webflow Cloud:**
-
-1. Go to your Webflow Dashboard → **Project Settings** → **Environment Variables**
-2. Add **public environment variables** (only these are available at runtime):
-   ```
-   NEXT_PUBLIC_ALGOLIA_APP_ID = your_app_id
-   NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY = your_search_key
-   ```
-   - Do NOT add `ALGOLIA_WRITE_API_KEY` to Webflow (not needed for frontend)
-
-**For GitHub Actions (Auto-Indexing):**
-
-1. Go to your GitHub repository → **Settings** → **Secrets and Variables** → **Actions**
-2. Add repository secrets:
-   ```
-   ALGOLIA_APP_ID = your_app_id
-   ALGOLIA_WRITE_API_KEY = your_admin_key
-   ```
-
-#### Step 4: Initial Index
-
-Index your documentation for the first time:
-
-```bash
-npm run index
-```
-
-You should see output like:
-```
-✅ Indexed: Getting Started (5 records)
-✅ Indexed: API Reference (8 records)
-...
-✅ Successfully indexed 45 records
-📊 Total records: 45
-🚀 Your search is now ready to use!
-```
-
-#### Step 5: Verify Search is Working
-
-1. Start development server: `npm run dev`
-2. Visit http://localhost:3002
-3. Press `Cmd+K` (or `Ctrl+K` on Windows/Linux)
-4. Search for a term from your documentation
-
-If the search modal opens and you can type, it's working!
-
-#### Step 6: Deploy and Auto-Indexing
-
-Once you push to GitHub, the GitHub Actions workflow automatically:
-1. Detects documentation changes
-2. Runs the indexer
-3. Uploads new records to Algolia
-4. Deploys to Webflow Cloud
-
-No manual intervention needed!
-
-### ⚙️ Configuration Details
-
-#### Base Path Auto-Detection
-
-The crawler intelligently detects your site's base path:
-
-1. **First check**: `BASE_PATH` environment variable
-2. **Second check**: `NEXT_PUBLIC_BASE_PATH` environment variable
-3. **Third check**: `basePath` in `next.config.ts`
-4. **Default**: Root path (empty string)
-
-This prevents 404 errors when clicking search results on sites deployed under a subdirectory.
-
-#### Customizing Crawler Behavior
-
-Edit `scripts/algolia-crawler.mjs` to:
-- Change the index name (line 48): `const indexName = 'documentation'`
-- Adjust content truncation limits (lines 68, 84, 104)
-- Add custom record fields or metadata
-
-### 🔧 Troubleshooting
-
-#### Search box doesn't appear
-
-**Cause**: Missing or incorrect environment variables
-
-**Solution**:
-1. Verify `NEXT_PUBLIC_ALGOLIA_APP_ID` and `NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY` are set
-2. Restart development server after setting variables
-3. Check browser console for errors (F12 → Console tab)
-
-#### Search returns no results
-
-**Cause**: Index is empty or hasn't been populated
-
-**Solution**:
-1. Run `npm run index` to populate the index
-2. Check Algolia dashboard to verify records exist
-3. Wait for GitHub Actions workflow to complete if auto-indexing
-
-#### 404 errors when clicking search results
-
-**Cause**: BASE_PATH mismatch
-
-**Solution**:
-1. Set `BASE_PATH` to match your deployment path (e.g., `/docs`)
-2. Re-run `npm run index` to re-index with correct paths
-3. Verify URLs in Algolia dashboard under **Indices** → **documentation** → **Browser**
-
-#### GitHub Actions workflow not triggering
-
-**Cause**: Secrets not configured
-
-**Solution**:
-1. Verify secrets exist: Go to **Settings** → **Secrets and variables** → **Actions**
-2. Check both `ALGOLIA_APP_ID` and `ALGOLIA_WRITE_API_KEY` are set
-3. Trigger manually: Go to **Actions** → **Index Documentation to Algolia** → **Run workflow**
-
-### 🚫 Disabling Search
-
-To disable search:
-1. Remove Algolia environment variables
-2. The search UI automatically disappears
-3. Your site continues to work normally
-
-No code changes needed!
-
-### 📚 Related Documentation
-
-- [Algolia Documentation](https://www.algolia.com/doc/)
-- [Algolia API Keys Guide](https://www.algolia.com/doc/guides/security/api-keys/)
-- [GitHub Actions Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
-- [Webflow Cloud Environment Variables](https://developers.webflow.com/webflow-cloud/environment/env-variables)
+While it's technically possible to implement third-party search solutions like Algolia, this template focuses on providing a minimal, working Nextra deployment on Webflow Cloud without additional dependencies or configuration complexity.
 
 ## Common Issues & Solutions
 
@@ -451,16 +279,6 @@ typescript: {
 
 You can still type-check locally before pushing.
 
-## Tutorial
-
-For a complete step-by-step guide, see [How to Deploy Nextra on Webflow Cloud](./lessons/deploy-nextra-to-webflow-cloud.md)
-
-The tutorial covers:
-- Complete setup from scratch
-- All configuration files explained
-- Common errors and their solutions
-- Why this configuration works
-- FAQs with official documentation references
 
 ## Tech Stack
 
@@ -497,4 +315,4 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ---
 
-**Questions?** Check out the [tutorial](./lessons/deploy-nextra-to-webflow-cloud.md) or visit [Webflow's Developer Forum](https://discourse.webflow.com/c/app-developers/90).
+**Questions?** Visit [Webflow's Developer Forum](https://discourse.webflow.com/c/app-developers/90) or check the [official documentation](#official-documentation).
